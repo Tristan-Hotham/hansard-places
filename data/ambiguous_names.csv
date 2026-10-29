@@ -1,0 +1,208 @@
+term,flag,any_flag,precision_factor,sample_n,why
+Acton,shared,shared,1.0,,"name shared with Acton (England, 52.07,0.76)"
+Aldridge,,surname,1.0,,
+Alexandria,namesake,namesake,1.0,,"also Alexandria, Egypt"
+Alva,,word,1.0,2,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Alva"" mentions that were the place"
+Amble,,word,1.0,12,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Amble"" mentions that were the place"
+Amersham,,other,1.0,,
+Amesbury,,other,1.0,,
+Annan,,other,1.0,,
+Antrim,namesake,namesake,1.0,,also County Antrim
+Ashford,shared,shared,1.0,,"name shared with Ashford (England, 51.43,-0.46)"
+Aston,,word,0.95,20,"ordinary word or name: counts scaled by 95%, the share of sampled ""in Aston"" mentions that were the place"
+Atherton,,surname,1.0,,
+Banff,namesake,namesake,1.0,,"also Banff, Canada"
+Bangor,shared,shared,1.0,,"name shared with Bangor (Wales, 53.23,-4.13)"
+Barnes,,word,1.0,12,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Barnes"" mentions that were the place"
+Barry,,other,1.0,,
+Bath,,word,0.875,40,"ordinary word or name: counts scaled by 88%, the share of sampled ""in Bath"" mentions that were the place"
+Battle,word,word,0.075,40,"ordinary word or name: 8% of sampled ""in Battle"" mentions were the place"
+Beaconsfield,,other,1.0,,
+Bedford,,surname,1.0,,
+Bellshill,,other,1.0,,
+Bentley,,word,1.0,7,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Bentley"" mentions that were the place"
+Berwick,shared,shared,1.0,,name shared with Berwick-upon-Tweed and North Berwick
+Berwick-upon-Tweed,,other,1.0,,
+Bethesda,namesake,namesake,1.0,,"also Bethesda, Maryland"
+Billericay,,other,1.0,,
+Bingham,,other,1.0,,
+Blackburn,shared,shared,1.0,,"name shared with Blackburn (Scotland, 55.87,-3.62); Blackburn (Scotland, 57.20,-2.29)"
+Blackheath,shared,shared,1.0,,"name shared with Blackheath (England, 52.48,-2.04)"
+Boston,namesake,namesake,1.0,,"also Boston, Massachusetts"
+Bourne,,other,1.0,5,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Bourne"" mentions that were the place"
+Bow,,other,1.0,28,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Bow"" mentions that were the place"
+Bradley Stoke,,other,1.0,,
+Brandon,,other,1.0,,
+Brent,,word,0.95,40,"ordinary word or name: counts scaled by 95%, the share of sampled ""in Brent"" mentions that were the place"
+Brough,,word,0.958,24,"ordinary word or name: counts scaled by 96%, the share of sampled ""in Brough"" mentions that were the place"
+Brownhills,,other,1.0,,
+Buckley,,surname,1.0,,
+Bury,,word,1.0,40,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Bury"" mentions that were the place"
+Camborne,,other,1.0,,
+Castleford,,other,1.0,,
+Cheadle,shared,shared,1.0,,"name shared with Cheadle (England, 52.99,-1.99)"
+Chingford,,other,1.0,,
+Chislehurst,,other,1.0,,
+Christchurch,namesake,namesake,1.0,,"also Christchurch, New Zealand"
+Church,namesake,namesake,1.0,40,also the Church
+City of London,,other,1.0,,
+City of Westminster,namesake,namesake,1.0,,also Parliament itself
+Clare,namesake,namesake,1.0,9,"also County Clare, Ireland"
+Cleveleys,,other,1.0,,
+Cowdenbeath,,other,1.0,,
+Cowes,,word,1.0,12,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Cowes"" mentions that were the place"
+Crawley,,surname,1.0,,
+Crook,,word,1.0,11,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Crook"" mentions that were the place"
+Cullen,,other,1.0,,
+Cumnock,,other,1.0,,
+Darlington,,surname,1.0,,
+Deal,,other,0.9,20,"ordinary word or name: counts scaled by 90%, the share of sampled ""in Deal"" mentions that were the place"
+Denny,,word,1.0,3,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Denny"" mentions that were the place"
+Diss,,word,1.0,4,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Diss"" mentions that were the place"
+Dollar,word,word,0.364,11,"ordinary word or name: 36% of sampled ""in Dollar"" mentions were the place"
+Duns,,word,1.0,6,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Duns"" mentions that were the place"
+Durham,namesake,namesake,1.0,,also County Durham
+Eastwood,,other,1.0,,
+Eccles,,other,1.0,,
+Ellesmere,,other,1.0,,
+Ely,,word,0.968,31,"ordinary word or name: counts scaled by 97%, the share of sampled ""in Ely"" mentions that were the place"
+Eton,,other,1.0,,
+Ewell,,other,1.0,,
+Eye,word,word,0.125,40,"ordinary word or name: 12% of sampled ""in Eye"" mentions were the place"
+Falkland,,other,1.0,,
+Felling,,other,1.0,,
+Fleet,,other,0.75,20,"ordinary word or name: counts scaled by 75%, the share of sampled ""in Fleet"" mentions that were the place"
+Flint,,word,0.958,24,"ordinary word or name: counts scaled by 96%, the share of sampled ""in Flint"" mentions that were the place"
+Fulwood,shared,shared,1.0,,"name shared with Fulwood (England, 53.79,-2.71)"
+Gainsborough,,other,1.0,,
+Garston,,other,1.0,,
+Gillingham,shared,shared,1.0,,"name shared with Gillingham (England, 51.04,-2.28)"
+Girvan,,surname,1.0,,
+Golders Green,,other,1.0,,
+Grays,,word,1.0,14,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Grays"" mentions that were the place"
+Hadleigh,shared,shared,1.0,,"name shared with Hadleigh (England, 52.04,0.95)"
+Hale,shared,shared,1.0,8,"name shared with Hale (England, 51.23,-0.79)"
+Hamilton,namesake,namesake,1.0,,"also Hamilton (Canada, New Zealand, Bermuda)"
+Hampton,namesake,namesake,1.0,28,also Hampton Court
+Harwich,,other,1.0,,
+Hayes,shared,shared,1.0,36,"name shared with Hayes (England, 51.38,0.02)"
+Hessle,,other,1.0,,
+Heston,,other,1.0,,
+Holloway,,surname,1.0,,
+Holt,,word,1.0,11,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Holt"" mentions that were the place"
+Honiton,,other,1.0,,
+Hook,word,word,1.0,4,the check cannot separate Hook from Hook Norton
+Horncastle,,other,1.0,,
+Howden,,other,1.0,,
+Hull,shared,shared,1.0,40,"name shared with the hull of a ship (lower case, checked)"
+Hyde,namesake,namesake,1.0,,"also Hyde Park, London"
+Hythe,shared,shared,1.0,,"name shared with Hythe (England, 51.07,1.08)"
+Keith,,other,1.0,,
+Kenilworth,,other,1.0,,
+Kilburn,,other,1.0,,
+Kilsyth,,other,1.0,,
+Kimberley,namesake,namesake,1.0,,"also Kimberley, South Africa"
+Kirkby,,word,0.975,40,"ordinary word or name: counts scaled by 98%, the share of sampled ""in Kirkby"" mentions that were the place"
+Kirkham,,other,1.0,,
+Kirkintilloch,,other,1.0,,
+Lancaster,namesake,namesake,1.0,,also the Duchy of Lancaster
+Leek,,word,0.925,40,"ordinary word or name: counts scaled by 92%, the share of sampled ""in Leek"" mentions that were the place"
+Leigh,,word,0.9,40,"ordinary word or name: counts scaled by 90%, the share of sampled ""in Leigh"" mentions that were the place"
+Leslie,,other,1.0,,
+Leven,,word,0.95,20,"ordinary word or name: counts scaled by 95%, the share of sampled ""in Leven"" mentions that were the place"
+Limehouse,,other,1.0,,
+Longfield,,other,1.0,,
+Looe,,word,0.963,27,"ordinary word or name: counts scaled by 96%, the share of sampled ""in Looe"" mentions that were the place"
+Loughton,shared,shared,1.0,,"name shared with Loughton (England, 51.66,0.07)"
+Louth,namesake,namesake,1.0,,"also County Louth, Ireland"
+Malton,,other,1.0,,
+March,word,word,1.0,10,"also the month (""in March"" is almost always the month)"
+Mere,word,word,0.3,10,"ordinary word or name: 30% of sampled ""in Mere"" mentions were the place"
+Minster,,other,1.0,4,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Minster"" mentions that were the place"
+Moffat,,surname,1.0,,
+Mold,,word,0.962,26,"ordinary word or name: counts scaled by 96%, the share of sampled ""in Mold"" mentions that were the place"
+Montgomery,namesake,namesake,1.0,,"also Montgomery, Alabama"
+Morden,,other,1.0,,
+Moreton,namesake,namesake,1.0,,also several Moretons
+Morley,,surname,1.0,,
+Nairn,,other,1.0,,
+Nantwich,,other,1.0,,
+Nelson,namesake,namesake,1.0,,"also Nelson, New Zealand"
+Neston,shared,shared,1.0,,"name shared with Neston (England, 53.28,-3.05)"
+Newbury,,surname,1.0,,
+Newcastle,shared,shared,1.0,,"name shared with Newcastle upon Tyne and Newcastle-under-Lyme (and Newcastle Emlyn, Newcastle in County Down)"
+Newport,shared,shared,1.0,,"name shared with Newport (Wales), Newport (Isle of Wight), Newport (Shropshire)"
+Nigg,,word,1.0,3,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Nigg"" mentions that were the place"
+Normanton,,other,1.0,,
+North Hykeham,,other,1.0,,
+Olney,,other,1.0,,
+Paisley,,other,1.0,,
+Penarth,,other,1.0,,
+Penistone,,other,1.0,,
+Perth,namesake,namesake,1.0,,"also Perth, Western Australia"
+Pinner,,other,1.0,,
+Pontefract,,other,1.0,,
+Porth,,word,1.0,20,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Porth"" mentions that were the place"
+Poynton,,surname,1.0,,
+Primrose Place,namesake,namesake,1.0,,also a street name
+Queensferry,namesake,namesake,1.0,,"also North and South Queensferry, Queensferry in Flintshire"
+Queenstown,namesake,namesake,1.0,,"also Queenstown, New Zealand"
+Reading,,word,0.6,40,"ordinary word or name: counts scaled by 60%, the share of sampled ""in Reading"" mentions that were the place"
+Redruth,,other,1.0,,
+Rhondda,,other,1.0,,
+Rhymney,,other,1.0,,
+Richmond,shared,shared,1.0,,"name shared with Richmond (England, 54.40,-1.74)"
+Rothwell,,other,1.0,,
+Royston,shared,shared,1.0,25,"name shared with Royston (England, 53.60,-1.45)"
+Royton,,other,1.0,,
+Ruislip,,other,1.0,,
+Rye,,other,0.786,14,"ordinary word or name: counts scaled by 79%, the share of sampled ""in Rye"" mentions that were the place"
+Ryton,shared,shared,1.0,,"name shared with Ryton (England, 54.97,-1.76)"
+Saddleworth,,other,1.0,,
+Saffron Walden,,other,1.0,,
+Sale,word,word,0.588,17,"ordinary word or name: 59% of sampled ""in Sale"" mentions were the place"
+Salisbury,namesake,namesake,1.0,,"also Salisbury, Rhodesia (now Harare), and Lord Salisbury"
+Sandbach,,surname,1.0,,
+Sandwich,,word,1.0,38,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Sandwich"" mentions that were the place"
+Sandy,,word,0.818,11,"ordinary word or name: counts scaled by 82%, the share of sampled ""in Sandy"" mentions that were the place"
+Selkirk,,other,1.0,,
+Settle,,other,1.0,1,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Settle"" mentions that were the place"
+Seven Sisters,namesake,namesake,1.0,,also the Seven Sisters cliffs
+Shaw,,other,1.0,10,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Shaw"" mentions that were the place"
+Shipley,,surname,1.0,,
+South Ruislip,,other,1.0,,
+Southam,,other,1.0,,
+St Ives,shared,shared,1.0,,"name shared with St Ives (England, 52.32,-0.07)"
+Stafford,,surname,1.0,,
+Stamford,,other,1.0,,
+Stanley,namesake,namesake,1.0,,"also Stanley, Falkland Islands"
+Stoke,shared,shared,1.0,40,name shared with several Stokes; most mentions are Stoke-on-Trent
+Stone,word,word,0.1,40,"ordinary word or name: 10% of sampled ""in Stone"" mentions were the place"
+Stratford,namesake,namesake,1.0,,also Stratford-upon-Avon and Stratford (London)
+Street,word,word,1.0,0,too common a word to check
+Stretford,,other,1.0,,
+Strood,,other,1.0,,
+Sunderland,,surname,1.0,,
+Surbiton,,other,1.0,,
+Sutton,,word,0.875,40,"ordinary word or name: counts scaled by 88%, the share of sampled ""in Sutton"" mentions that were the place"
+Thame,,word,0.909,11,"ordinary word or name: counts scaled by 91%, the share of sampled ""in Thame"" mentions that were the place"
+Thamesmead,,other,1.0,,
+Thornton,,surname,1.0,,
+Tynemouth,,other,1.0,,
+Urmston,,other,1.0,,
+Usk,,word,1.0,5,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Usk"" mentions that were the place"
+Wallington,,other,1.0,,
+Ware,,word,1.0,7,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Ware"" mentions that were the place"
+Washington,namesake,namesake,1.0,,also Washington DC
+Wellington,shared,shared,1.0,,"name shared with Wellington (England, 50.98,-3.23)"
+Wells,,other,0.811,37,"ordinary word or name: counts scaled by 81%, the share of sampled ""in Wells"" mentions that were the place"
+Whitburn,shared,shared,1.0,,"name shared with Whitburn (England, 54.95,-1.36)"
+Whitby,,surname,1.0,,
+Whitchurch,shared,shared,1.0,,"name shared with Whitchurch (England, 51.23,-1.34)"
+Wick,,word,1.0,40,"ordinary word or name: counts scaled by 100%, the share of sampled ""in Wick"" mentions that were the place"
+Wickford,,other,1.0,,
+Windsor,namesake,namesake,1.0,,also the Windsor Framework (from 2023)
+Winterton,,other,1.0,,
+Woodford Green,,other,1.0,,
+Worsley,,other,1.0,,
+Yarmouth,,other,1.0,,

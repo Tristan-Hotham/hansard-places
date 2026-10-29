@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mentioned in the House</title>
+<meta name="description" content="Which places do MPs talk about? {{in_total_1909_2025|int}} Commons mentions of {{n_clean|int}} UK towns and cities, 1909 to 2025, from Hansard, mapped and counted per head, plus how often each seat is named by its own MP and by others.">
+<meta property="og:title" content="Mentioned in the House: which places does Parliament talk about?">
+<meta property="og:description" content="Commons mentions of UK towns and cities from Hansard, 1909 to 2025. London takes {{london.share_2005_2025}}% of town mentions since 2005; most seats are named mostly by other members, not their own.">
+<meta property="og:image" content="https://maps.tristanhotham.com/hansard-places/header.png">
+<meta property="og:url" content="https://maps.tristanhotham.com/hansard-places/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800;9..144,900&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* Order Paper white, Hansard ink blue, Commons green for a seat's own member, ochre and slate for more or fewer mentions than size predicts. */
+:root{
+  --bg:#F6F4EE; --panel:#ECE8DD; --fg:#1A1C22; --muted:#626570; --rule:#D9D5C8; --card:#FCFBF7; --border:#C6C1B2;
+  --hot:#1F4F8B; --hot2:#14365F; --green:#2E6B4E; --over:#C0561B; --under:#5E7BA6; --land:#E6E2D6; --sea:#D8E0E6; --none:#B4B0A6;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121418; --panel:#1C1F25; --fg:#E9E7E1; --muted:#A3A5AC; --rule:#30343C; --card:#1D2026; --border:#474B54;
+  --hot:#7FA8E0; --hot2:#A9C6EE; --green:#6CC59A; --over:#F08A4B; --under:#8EA6CF; --land:#272A30; --sea:#171A1F; --none:#5A5D63; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121418; --panel:#1C1F25; --fg:#E9E7E1; --muted:#A3A5AC; --rule:#30343C; --card:#1D2026; --border:#474B54;
+  --hot:#7FA8E0; --hot2:#A9C6EE; --green:#6CC59A; --over:#F08A4B; --under:#8EA6CF; --land:#272A30; --sea:#171A1F; --none:#5A5D63; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 18px/1.62 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow-x:hidden}
+.wrap{max-width:700px;margin:0 auto;padding-block:28px 64px}
+.wrap .bleed{width:min(1120px,calc(100vw - 32px));margin-left:calc((100% - min(1120px,100vw - 32px))/2);margin-right:0}
+a{color:inherit;text-decoration-color:var(--hot);text-underline-offset:3px}
+.kicker{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.kicker b{background:var(--hot);color:var(--bg);padding:5px 8px;font-weight:500}
+header.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 24px;align-items:end;border-bottom:6px double var(--fg);padding-bottom:22px;margin-top:18px}
+h1{font:900 clamp(44px,11vw,96px)/.92 var(--display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--hot)}
+.mark{width:clamp(78px,17vw,140px);height:auto;display:block}
+.dek{grid-column:1/-1;font-size:21px;line-height:1.42;margin:8px 0 0;max-width:48ch}
+.byline{font:400 13px/1.4 var(--mono);color:var(--muted);margin-top:14px}
+h2{font:800 34px/1.04 var(--display);letter-spacing:-.01em;margin:52px 0 10px;text-wrap:balance}
+h2 .n{font:500 13px/1 var(--mono);color:var(--hot);display:block;letter-spacing:.1em;margin-bottom:10px}
+h3{font:600 20px/1.25 var(--display);margin:28px 0 6px}
+p{margin:0 0 16px}
+.lede::first-letter{font:900 72px/.8 var(--display);float:left;margin:6px 10px 0 0;color:var(--hot)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin:26px 0 8px}
+.stats div{background:var(--card);padding:14px 12px}
+.stats b{display:block;font:900 clamp(26px,5.6vw,38px)/1 var(--display)}
+.stats b.h{color:var(--hot)}
+.stats span{font:400 12px/1.35 var(--mono);color:var(--muted);display:block;margin-top:6px}
+@media (max-width:600px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.figure{margin:26px 0 30px}
+.fig-h{font:600 19px/1.25 var(--display);margin:0 0 4px}
+.fig-sub{font:400 13px/1.45 var(--mono);color:var(--muted);margin:0 0 12px}
+.src{font:400 12px/1.45 var(--mono);color:var(--muted);margin-top:10px}
+.chart{width:100%;position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{font-family:var(--mono);fill:var(--fg)}
+.lab{font-size:12px}.lab.m{fill:var(--muted)}.lab.b{font-weight:500}.lab.s{font-size:11px}
+.tip{position:absolute;pointer-events:none;background:var(--fg);color:var(--bg);font:400 12px/1.45 var(--mono);padding:8px 10px;border-radius:3px;max-width:280px;z-index:1000;transform:translate(-50%,calc(-100% - 12px));display:none}
+.tip b{font-weight:500}
+.btn{font:500 12px/1 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:8px 10px;cursor:pointer;min-height:36px;white-space:nowrap}
+.btn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--hot);outline-offset:2px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;flex:0 0 auto}
+.seg .btn{border:0;border-radius:0;border-right:1px solid var(--border)}
+.seg .btn:last-child{border-right:0}
+.mapbox{position:relative}
+.ctl{display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;margin:0 0 8px;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.ctl::-webkit-scrollbar{height:4px}.ctl::-webkit-scrollbar-thumb{background:var(--border)}
+.timebar{display:flex;gap:10px;align-items:center;margin:0 0 8px}
+.timebar[hidden]{display:none}
+.timebar input[type=range]{flex:1 1 auto;min-width:0;accent-color:var(--hot);height:28px}
+.when{font:800 26px/1 var(--display);min-width:4.2ch;white-space:nowrap}
+.searchbox{position:relative;flex:1 1 200px;min-width:150px}
+input[type=search]{font:400 14px/1 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:9px 10px;min-height:36px;width:100%}
+.suggest{position:absolute;left:0;right:0;top:100%;margin:2px 0 0;padding:0;list-style:none;background:var(--card);border:1px solid var(--border);z-index:1001;font:400 13px/1.3 var(--mono);display:none;max-height:300px;overflow:auto}
+.suggest li{padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--rule)}
+.suggest li span{color:var(--muted)}
+.suggest li[aria-selected="true"],.suggest li:hover{background:var(--panel)}
+#lmap{overflow:hidden;contain:paint;height:680px;border:1px solid var(--border);background:var(--sea);border-radius:2px}
+@media (max-width:600px){#lmap{height:min(58vh,500px)} .when{font-size:22px} body{font-size:17px}}
+.leaflet-container{font:400 12px/1.4 var(--mono);background:var(--sea)}
+.leaflet-bar a,.leaflet-bar a:hover{background:var(--card);color:var(--fg);border-bottom-color:var(--border)}
+.leaflet-control-attribution{background:color-mix(in srgb,var(--card) 85%,transparent)!important;color:var(--muted)}
+.leaflet-control-attribution a{color:var(--fg)}
+.lyrBtn{background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;font:600 12px/1 var(--mono);padding:8px 10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.lyrBtn[aria-expanded="true"]{background:var(--fg);color:var(--bg)}
+.lyrPanel{background:var(--card);border:1px solid var(--border);border-radius:3px;margin-top:6px;padding:10px 12px;width:236px;font:400 12px/1.4 var(--mono);box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.lyrPanel .row{display:grid;grid-template-columns:1fr;gap:3px;margin-bottom:9px}
+.lyrPanel label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.lyrPanel .sub{display:flex;gap:6px;align-items:center;padding-left:22px;color:var(--muted)}
+.lyrPanel .sub input[type=range]{flex:1;accent-color:var(--hot)}
+.lyrPanel select{min-height:28px;padding:4px;font:500 12px/1 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px}
+.lyrPanel .reset{font:500 11px/1 var(--mono);background:none;border:1px solid var(--border);color:var(--fg);padding:6px 8px;border-radius:3px;cursor:pointer}
+.city{font:500 11px/1 var(--mono);color:var(--fg);white-space:nowrap;text-shadow:0 0 3px var(--bg),0 0 3px var(--bg),0 0 2px var(--bg)}
+.city i{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--fg);margin-right:4px;vertical-align:1px}
+.city.r0{font-size:10px;color:var(--muted)}.city.r0 i{width:4px;height:4px;background:var(--muted)}
+.city.big{font:600 12px/1 var(--mono)}.city.big i{display:none}
+.legend{display:flex;gap:4px 12px;flex-wrap:wrap;font:400 12px/1.3 var(--mono);color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.legend b{color:var(--fg);font-weight:500}
+.ramp{display:flex;align-items:center;gap:8px;font:400 12px/1.3 var(--mono);color:var(--muted);flex-wrap:wrap;margin-top:8px}
+.ramp .bar{display:flex;height:12px;width:180px;max-width:46vw;border:1px solid var(--border)}
+.ramp .bar span{flex:1}
+#info{background:var(--card);border:1px solid var(--border);border-top:4px solid var(--hot);padding:14px 16px;margin-top:12px;font:400 13px/1.5 var(--mono);min-height:60px}
+#info .t{font:600 21px/1.2 var(--display);margin:0 0 2px}
+#info .c{color:var(--muted);margin-bottom:8px}
+#info table{width:100%;border-collapse:collapse;margin:6px 0}
+#info td{padding:4px 6px 4px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+#info td.num{text-align:right;white-space:nowrap;font-weight:500}
+#info .flag{border-left:4px solid var(--over);padding:6px 10px;background:var(--panel);margin:8px 0}
+.ownbar{display:flex;height:14px;border:1px solid var(--border);margin:6px 0 4px;overflow:hidden;border-radius:2px}
+.ownbar span{display:block;height:100%}
+.stories{display:flex;gap:8px;overflow-x:auto;padding:2px 0 8px;margin:6px 0 4px;scrollbar-width:thin}
+.stories button{flex:0 0 auto;text-align:left;font:400 12px/1.35 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-left:4px solid var(--hot);border-radius:3px;padding:8px 10px;cursor:pointer;max-width:220px;white-space:normal}
+.stories button b{display:block;font:600 15px/1.2 var(--display)}
+.pull{font:600 26px/1.25 var(--display);border-left:6px solid var(--hot);padding:4px 0 4px 18px;margin:30px 0}
+.note{background:var(--panel);border:1px solid var(--rule);padding:14px 16px;font-size:16px;margin:22px 0}
+.note h3{margin-top:0}
+table.t{width:100%;border-collapse:collapse;font:400 13px/1.35 var(--mono)}
+table.t th{text-align:left;font-weight:500;color:var(--muted);border-bottom:2px solid var(--fg);padding:6px 8px 6px 0}
+table.t td{border-bottom:1px solid var(--rule);padding:7px 8px 7px 0;vertical-align:top}
+table.t td.num,table.t th.num{text-align:right;white-space:nowrap}
+.tablewrap{overflow-x:auto}
+details{margin:14px 0}
+summary{font:500 13px/1.4 var(--mono);cursor:pointer;color:var(--fg);padding:8px 0}
+.spikes{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:14px 0}
+.spike{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--hot);padding:10px 12px;cursor:pointer;text-align:left;font:400 12px/1.4 var(--mono);color:var(--fg)}
+.spike b{display:block;font:600 17px/1.2 var(--display)}
+.spike .y{font:800 22px/1 var(--display);color:var(--hot)}
+.spike svg{display:block;width:100%;height:34px;margin-top:6px}
+.spike .tt{color:var(--muted);display:block;margin-top:4px}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.cta a{font:500 13px/1 var(--mono);text-decoration:none;border:1px solid var(--fg);padding:11px 14px;border-radius:3px}
+.cta a.p{background:var(--hot);border-color:var(--hot);color:var(--bg)}
+footer{border-top:6px double var(--fg);margin-top:56px;padding-top:16px;font:400 13px/1.55 var(--mono);color:var(--muted)}
+footer p{margin:0 0 10px}
+.theme{position:fixed;right:12px;bottom:12px;z-index:1002}
+ul.src-list{font-size:16px;padding-left:20px}
+ul.src-list li{margin-bottom:8px}
+@media print{.theme,.ctl,.timebar,.stories{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="kicker"><b>Data study</b><span>Parliament · 1909 to 2026</span><span>2026</span></div>
+<header class="hero">
+  <h1>Mentioned in <em>the House</em></h1>
+  <svg class="mark" viewBox="0 0 120 120" aria-hidden="true"><path d="M20 22h62l18 18v58H20z" fill="none" stroke="currentColor" stroke-width="5"/><path d="M82 22v18h18" fill="none" stroke="currentColor" stroke-width="5"/><path d="M32 52h44M32 64h52M32 76h36" stroke="currentColor" stroke-width="4"/><circle cx="84" cy="80" r="15" fill="var(--hot)"/><circle cx="84" cy="77" r="5" fill="var(--bg)"/><path d="M84 95l-7-9h14z" fill="var(--hot)"/></svg>
+  <p class="dek">Which towns and cities do MPs talk about in the Commons, and which do they never mention? A century of Hansard, counted place by place, and every seat since 2005: how often it is named, and by whom.</p>
+</header>
+<p class="byline">Dr Tristan Hotham · Independent researcher · 2026</p>
+
+<p class="lede">Every word spoken in the House of Commons is printed in Hansard, and since 1909 it has been printed verbatim. That makes it a record of which places Parliament has had on its mind. I asked the Hansard search service a simple question for {{n_place_terms|int}} towns, cities and districts across the UK: in how many Commons contributions does someone say "in Barnsley", "in Bath", "in Belfast", year by year? The answer is {{in_total_1909_2025|int}} counted mentions from 1909 to 2025. No speech text was downloaded; only the counts.</p>
+
+<div class="stats">
+  <div><b class="h">{{london.share_2005_2025}}%</b><span>of town and city mentions since 2005 are of London</span></div>
+  <div><b>{{over_expected.0.1}}x</b><span>{{over_expected.0.0}}, the most mentioned town for its size, against what its population predicts</span></div>
+  <div><b>{{seat_own_share_median}}%</b><span>of a seat's mentions come from its own MP (median seat)</span></div>
+  <div><b>{{n_seats|int}}</b><span>Commons seats tracked, 2005 to 2026</span></div>
+</div>
+
+<h2><span class="n">01 · The map</span>Where the Commons looks</h2>
+<p>Each circle is a place, sized by how often it was mentioned. Switch to <b>For its size</b> to see which places get more attention than their population predicts, to <b>Year by year</b> to play through a century, or to <b>Seats</b> for constituencies since 2005. Tap a circle for its story; search for your town.</p>
+
+<div class="bleed">
+<div class="mapbox">
+  <div class="ctl">
+    <div class="seg" role="group" aria-label="What the map shows">
+      <button class="btn" data-mode="count" aria-pressed="true">Mentions</button>
+      <button class="btn" data-mode="size" aria-pressed="false">For its size</button>
+      <button class="btn" data-mode="time" aria-pressed="false">Year by year</button>
+      <button class="btn" data-mode="seats" aria-pressed="false">Seats</button>
+    </div>
+    <div class="searchbox">
+      <input type="search" id="q" placeholder="Find a town" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="sug" aria-label="Find a town">
+      <ul class="suggest" id="sug" role="listbox"></ul>
+    </div>
+  </div>
+  <div class="timebar" id="timebar" hidden>
+    <button class="btn" id="play" aria-label="Play through the years">▶ Play</button>
+    <input type="range" id="yr" min="1909" max="2026" step="1" value="1940" aria-label="Year">
+    <div class="when" id="when" aria-live="polite">1940</div>
+  </div>
+  <div class="stories" id="stories" aria-label="Stories"></div>
+  <div id="lmap" role="region" aria-label="Map of places mentioned in the House of Commons"></div>
+  <div id="legend"></div>
+  <div id="info" aria-live="polite">Tap or click a circle to see how often that place has been mentioned, and when.</div>
+  <p class="src">Counts of Commons contributions containing the phrase "in" plus the place name (Hansard API, UK Parliament). Hollow grey circles are names that are shared or ambiguous and are left out of the rankings (see section 06). Seats sit at a point for each constituency, not its boundary.</p>
+</div>
+</div>
+
+<h2><span class="n">02 · The league table</span>London first, then the big cities</h2>
+<p>From 2005 to 2025, London was mentioned in {{london.in_2005_2025|int}} contributions with "in London", {{london.share_2005_2025}}% of all the town and city mentions counted here. Then come {{top_in_2005_2025.1.0}} ({{top_in_2005_2025.1.1|int}}), {{top_in_2005_2025.2.0}} ({{top_in_2005_2025.2.1|int}}), {{top_in_2005_2025.3.0}} ({{top_in_2005_2025.3.1|int}}) and {{top_in_2005_2025.4.0}} ({{top_in_2005_2025.4.1|int}}). Across the whole century from 1909, London's share was {{london.share_1909_2025}}%.</p>
+<div class="figure">
+  <p class="fig-h">Most mentioned towns and cities in the Commons</p>
+  <p class="fig-sub">Contributions containing "in" plus the name. Switch the period.</p>
+  <div class="ctl"><div class="seg" role="group" aria-label="Period"><button class="btn" data-top="mod" aria-pressed="true">2005 to 2025</button><button class="btn" data-top="long" aria-pressed="false">1909 to 2025</button></div></div>
+  <div class="chart" id="c_top"></div>
+</div>
+
+<h2><span class="n">03 · For its size</span>Who punches above their weight</h2>
+<p>Bigger places get mentioned more, but not in proportion. Across the {{n_per_head|int}} places with at least 50,000 people, mentions grow with population to the power {{pop_elasticity}} (a correlation of {{pop_r}} on log scales): a town ten times bigger gets about {{pop_ten}} times the mentions. The places furthest above that line are {{over_expected.0.0}} ({{over_expected.0.1}} times what its size predicts), {{over_expected.1.0}} ({{over_expected.1.1}}), {{over_expected.2.0}} ({{over_expected.2.1}}) and {{over_expected.3.0}} ({{over_expected.3.1}}). Some of the gap is one big year (Rotherham's peak year was {{peak_of.Rotherham.0}}, at {{peak_of.Rotherham.1}} times its usual share), some is steady attention from the town's own member. Where the town and its seat share a name, the seat's own MP spoke {{over_seat_own.0.1}}% of the contributions naming {{over_seat_own.0.0}} since 2005, {{over_seat_own.4.1}}% for {{over_seat_own.4.0}} and {{over_seat_own.1.1}}% for {{over_seat_own.1.0}}. Per head, the median place with 50,000 people or more was mentioned {{per_head_median}} times per 100,000 residents from 2005 to 2025.</p>
+<div class="figure bleed">
+  <p class="fig-h">Population and Commons mentions, 2005 to 2025</p>
+  <p class="fig-sub">Towns and cities with 50,000 people or more (Census 2021 built-up areas in England and Wales, GeoNames elsewhere). Both axes are logarithmic. The line is the fitted trend; hover or tap a dot.</p>
+  <div class="chart" id="c_scatter"></div>
+</div>
+
+<h2><span class="n">04 · A century</span>When places had their moment</h2>
+<p>Most places are mentioned at a low, steady rate for decades, then once in a while a single year lifts them. For each place mentioned at least 150 times since 1909, I found the year in which its share of all town mentions was highest, compared with its usual year. The cards below are the biggest jumps; the titles under each are the debates that came up most often among up to 50 such contributions for that year returned by the Hansard search.</p>
+<div class="spikes" id="spikes"></div>
+<p>London's grip has loosened and tightened. Its share of town and city mentions was {{london_share_by_decade.1910}}% in the 1910s, {{london_share_by_decade.1940}}% in the 1940s, {{london_share_by_decade.1980}}% in the 1980s and {{london_share_by_decade.2020}}% in the 2020s.</p>
+<div class="figure">
+  <p class="fig-h">London's share of town and city mentions, by decade</p>
+  <div class="chart" id="c_london"></div>
+</div>
+<p>The nations tell a political story. The chart counts "in England", "in Scotland", "in Wales" and "in Northern Ireland" for every 100 town and city mentions in the same decade. Northern Ireland, created in 1921, was named about {{nat_per100.Northern Ireland.1960}} times per 100 in the 1960s and {{nat_per100.Northern Ireland.1970}} in the 1970s, the first decade of the Troubles. Scotland stayed between {{scot_lo}} and {{scot_hi}} from the 1910s to the 1970s and fell to {{nat_per100.Scotland.2000}} in the 2000s, the first decade of the Scottish Parliament. Wales rose from {{nat_per100.Wales.1920}} in the 1920s to {{nat_per100.Wales.1970}} in the 1970s.</p>
+<div class="figure">
+  <p class="fig-h">The nations, for every 100 town and city mentions</p>
+  <div class="chart" id="c_nat"></div>
+  <div class="legend" id="c_nat_leg"></div>
+</div>
+
+<h2><span class="n">05 · Seats</span>Who says your constituency's name?</h2>
+<p>MPs refer to each other by seat: "the hon. Member for Barrow and Furness". And members name their own seats all the time, to speak for them. Using the Members API I listed every MP who sat from 2005 to October 2026 ({{n_members|int}} members) and every seat they held ({{n_seats|int}} seat names). For each seat I counted the contributions that contain its name while it existed, and how many of those came from its own members.</p>
+<p>Across all seats, {{seat_own_share_overall}}% of mentions of a seat's name came from its own MP; for the median seat it is {{seat_own_share_median}}% (half of all seats lie between {{seat_own_share_iqr.0}}% and {{seat_own_share_iqr.1}}%). The rest come from other members, very often in the "Member for" form: {{seat_mf_total|int}} of the {{seat_any_total|int}} mentions contain "Member for" and the seat name. Members seldom say their own seat's full name; they are more likely to say "my constituency". The seat named most often in the "Member for" form is {{mf_top.0}}, about {{mf_top.1|int}} times a year; the median seat about {{seat_median_mf_per_year|int}} times. Seats held by Sinn Féin members, who do not take their seats, have no mentions from their own member.</p>
+<div class="figure">
+  <p class="fig-h">Share of each seat's mentions that come from its own MP</p>
+  <p class="fig-sub">Seats mentioned at least 20 times, 2005 to 2026, whose names are not also an ambiguous place name.</p>
+  <div class="chart" id="c_own"></div>
+</div>
+<p class="note">This is a count of words, not a judgement of anyone's work. A seat named often by its own member may have a member who speaks a lot, or one who names the seat in every question; a seat named rarely may have a member who is a minister, a whip or the Speaker, who by convention speak less for their constituencies. Seats whose names are ordinary place names also pick up mentions of the town.</p>
+
+<h2><span class="n">06 · Reading, Sale and Deal</span>Names that mean something else</h2>
+<p>Counting words is easy; knowing which Reading is meant is not. I handled ambiguous names in four ways, and every one is listed in the data.</p>
+<p><b>Ordinary words.</b> "In reading the Bill", "in sale", "a deal": for {{n_words_checked|int}} names that are also everyday words or names, I sampled up to 40 contributions containing "in" plus the name from 2005 to 2025 and checked whether the name had a capital letter. That gives a precision, and the counts are scaled by it: Bath keeps {{prec_pct.Bath}}% of its count, Wells {{prec_pct.Wells}}%, Deal {{prec_pct.Deal}}% and Reading {{prec_pct.Reading}}%. Names below 60%, or that the check cannot handle, are left out of the rankings ({{n_flag.word}} names: Sale at {{prec_pct.Sale}}% of {{prec_n.Sale}}, Stone, Battle and Eye; March, which is nearly always the month; Street, too common to check; and a few more). Sale, the town in Greater Manchester, is real enough, but "in sale" turns up too often in other senses.</p>
+<p><b>Namesakes.</b> {{n_flag.namesake}} names are better known as somewhere or something else: Washington, Perth, Boston, Salisbury (also the old name of Harare), the Duchy of Lancaster, the Windsor Framework, County Durham. They are shown hollow and left out. <b>Shared names.</b> {{n_flag.shared}} names belong to more than one UK place in my list (Newport, Bangor, Richmond and others) and cannot be split, so they are left out of the rankings too. <b>Other meanings.</b> For the any-mention count, names that are also members' surnames or whose "in" share is far below the norm are marked.</p>
+<details><summary>Show every ambiguous name and what was done with it</summary><div class="tablewrap" id="ambig"></div></details>
+
+<h2><span class="n">07 · How I did this</span>Methods and caveats</h2>
+<p><b>Counts, not text.</b> The UK Parliament Hansard API has a timeline service that returns, for any search, the number of matching contributions in each year. I ran {{n_queries|int}} searches in the House of Commons, contribution type "Spoken" (speeches, questions and answers, interventions), each for a quoted phrase, and kept only the counts. A contribution counts once however many times it uses the phrase.</p>
+<p><b>Two measures.</b> The headline measure is the phrase "in" plus the place name (for example "in Barnsley"). It is a consistent sample of how places come up when members talk about them as places, and it is not inflated by the "hon. Member for" formula, by surnames, or by division lists. The second measure counts any mention of the name, but only from 2005: before then the Hansard API files the lists of members voting in each division, with seats in brackets, as spoken contributions ({{tellers_note}}), which swamps the count for any seat name.</p>
+<p><b>Places.</b> The list is every UK place in GeoNames with 15,000 people or more and every town and city in OS Open Names, merged by name, plus a few short forms used in speech (Southend, Stockton, Leamington, Newark, Berwick, Merthyr, Hull, Stoke, Londonderry with Derry), the four nations and some London boroughs. A search for "in Southend" also finds "in Southend-on-Sea". Populations are Census 2021 built-up areas (ONS) for towns in England and Wales and GeoNames figures elsewhere; per-head figures use only real towns and cities of 50,000 people or more, and are a guide, not a measure. The list is today's UK, so Irish towns before 1922 are not counted, which raises London's share in the 1910s. Where one name begins another, the longer name's "in" count is taken off the shorter one ("in Bury" also finds "in Bury St Edmunds"; {{prefix_pairs}} such pairs).</p>
+<p><b>Seats.</b> Members and seats come from the UK Parliament Members API. A member's own mentions are those they spoke while holding the seat. Seats are placed at points from the sister project <a href="https://maps.tristanhotham.com/elections-since-1832/">Who Won Here?</a>; {{n_seats_with_point|int}} of {{n_seats|int}} seat names have a point.</p>
+<p><b>Limits.</b> Search counts depend on Parliament's search index and on how the record was digitised; older volumes were scanned and may miss words. The number of contributions per year changes over time (longer sittings, more questions), so the long view uses shares of all counted mentions, not raw counts. Hansard text is the record of what was said, edited for clarity. The Lords, written questions and committees are not counted.</p>
+
+<h2><span class="n">08 · Sources</span>Data and licences</h2>
+<ul class="src-list">
+<li>Hansard, House of Commons, via the UK Parliament Hansard API (<a href="https://hansard-api.parliament.uk/">hansard-api.parliament.uk</a>, timeline statistics and contribution search), retrieved 29 October 2026. Contains Parliamentary information licensed under the Open Parliament Licence v3.0.</li>
+<li>UK Parliament Members API (<a href="https://members-api.parliament.uk/">members-api.parliament.uk</a>), members and seat histories, Open Parliament Licence v3.0.</li>
+<li>GeoNames cities with 15,000 or more people (populations and points), CC BY 4.0. OS Open Names (contains OS data © Crown copyright and database right 2026), Open Government Licence v3.0. ONS county outlines, Open Government Licence v3.0; Natural Earth (public domain).</li>
+<li>Constituency points from <a href="https://maps.tristanhotham.com/elections-since-1832/">Who Won Here?</a> (Wikidata, CC0, and OS Open Names).</li>
+<li>Base map and hill shading tiles © Esri.</li>
+</ul>
+<div class="cta">
+  <a class="p" href="https://doi.org/10.5281/zenodo.23761431">Read the paper</a>
+  <a href="https://github.com/Tristan-Hotham/hansard-places">Data and code</a>
+  <a href="https://blog.tristanhotham.com/2026/10/29/hansard-places/">Blog post</a>
+  <a href="https://maps.tristanhotham.com/elections-since-1832/">Who Won Here?</a>
+</div>
+
+<footer>
+<p>Dr Tristan Hotham, Independent researcher. ORCID <a href="https://orcid.org/0000-0003-4931-9349">0000-0003-4931-9349</a>. Cite as: Hotham, T. (2026) Mentioned in the House: which places does Parliament talk about? <a href="https://doi.org/10.5281/zenodo.23761431">https://doi.org/10.5281/zenodo.23761431</a></p>
+<p>I wrote the text, with drafting and editing assistance from Claude (Anthropic), which also helped prepare the analysis code. I reviewed and checked all text and results.</p>
+<p>Data and text: CC BY 4.0. Code: MIT. Contains Parliamentary information licensed under the Open Parliament Licence v3.0. <a href="https://blog.tristanhotham.com/">More data studies on the blog</a>.</p>
+</footer>
+</div>
+<button class="btn theme" id="theme" aria-label="Switch light or dark theme">◐</button>
+<div class="tip" id="tip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const R = /*R*/;
+const ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" };
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ESC[c]);
+const fmt = v => v == null ? "" : Math.round(v).toLocaleString("en-GB");
+const tip = document.getElementById("tip"), redraws = [];
+const isDark = () => document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function showTip(h, x, y) { tip.innerHTML = h; tip.style.display = "block"; const w = tip.offsetWidth; x = Math.max(w / 2 + 8, Math.min(innerWidth - w / 2 - 8, x)); tip.style.left = x + scrollX + "px"; tip.style.top = y + scrollY + "px"; }
+function hideTip() { tip.style.display = "none"; }
+function hover(node, h) { node.style.cursor = "pointer"; node.setAttribute("tabindex", "0"); const s = () => { const r = node.getBoundingClientRect(); showTip(h, r.left + r.width / 2, r.top); }; node.addEventListener("pointerenter", s); node.addEventListener("pointerleave", hideTip); node.addEventListener("focus", s); node.addEventListener("blur", hideTip); }
+const NS = "http://www.w3.org/2000/svg";
+function el(t, a, p) { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; }
+function lbl(svg, x, y, t, c, a) { const e = el("text", { x, y, class: c || "lab", "text-anchor": a || "start" }, svg); e.textContent = t; return e; }
+function resp(box, render) { let last = 0; const go = (force) => { const w = Math.max(280, Math.round(box.clientWidth)); if (!force && Math.abs(w - last) < 4) return; last = w; box.innerHTML = ""; render(w, w < 560); }; new ResizeObserver(() => go()).observe(box); go(); redraws.push(() => go(true)); }
+document.getElementById("theme").onclick = () => { const d = isDark(); document.documentElement.dataset.theme = d ? "light" : "dark"; redraws.forEach(f => f()); };
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => redraws.forEach(f => f()));
+function hexToRgb(h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; }
+function mix(a, b, t) { const A = hexToRgb(a), B = hexToRgb(b); return "rgb(" + A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(",") + ")"; }
+const Y0 = 1909, YN = 2026;
+let PL = null, SE = null, LAB = null, YRS = null;  // places, seats, labels, yearly counts
+
+/* ===== charts ===== */
+let topMode = "mod";
+function topChart() {
+  resp(document.getElementById("c_top"), (W, nar) => {
+    const rows = (topMode === "mod" ? R.top_in_2005_2025 : R.top_in_1909_2025).slice(0, nar ? 15 : 20), rowH = 24, m = { l: nar ? 112 : 150, r: 60 }, H = rows.length * rowH + 4;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Most mentioned towns and cities" }, document.getElementById("c_top"));
+    const max = rows[0][1], X = v => m.l + v / max * (W - m.l - m.r);
+    rows.forEach(([t, v], i) => { const y = i * rowH + 2; lbl(svg, m.l - 8, y + 16, t, "lab", "end"); const r = el("rect", { x: m.l, y: y + 4, width: Math.max(1, X(v) - m.l), height: rowH - 8, fill: i ? "var(--hot)" : "var(--hot2)" }, svg); lbl(svg, X(v) + 6, y + 16, fmt(v), "lab b s"); hover(r, `<b>${esc(t)}</b><br>${fmt(v)} contributions`); });
+  });
+}
+document.querySelectorAll("[data-top]").forEach(b => b.onclick = () => { topMode = b.dataset.top; document.querySelectorAll("[data-top]").forEach(x => x.setAttribute("aria-pressed", x === b)); redraws.forEach(f => f()); });
+function scatter() {
+  resp(document.getElementById("c_scatter"), (W, nar) => {
+    if (!PL) return;
+    const pts = PL.filter(p => p.per100k != null), H = nar ? 360 : 460, m = { l: 46, r: 12, t: 10, b: 40 };
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Population against Commons mentions for places of 50,000 people or more" }, document.getElementById("c_scatter"));
+    const lx0 = Math.log10(40000), lx1 = Math.log10(12e6), ly0 = Math.log10(3), ly1 = Math.log10(30000);
+    const X = v => m.l + (Math.log10(v) - lx0) / (lx1 - lx0) * (W - m.l - m.r), Y = v => m.t + (1 - (Math.log10(Math.max(v, 3)) - ly0) / (ly1 - ly0)) * (H - m.t - m.b);
+    [5e4, 1e5, 3e5, 1e6, 3e6, 1e7].forEach(v => { el("line", { x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, stroke: "var(--rule)" }, svg); lbl(svg, X(v), H - m.b + 16, v >= 1e6 ? v / 1e6 + "m" : v / 1e3 + "k", "lab m s", "middle"); });
+    [10, 100, 1000, 10000].forEach(v => { el("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: "var(--rule)" }, svg); lbl(svg, m.l - 5, Y(v) + 4, fmt(v), "lab m s", "end"); });
+    lbl(svg, W - m.r, H - 4, "population", "lab m s", "end"); lbl(svg, m.l + 4, m.t + 10, "mentions", "lab m s");
+    const fx = [lx0, lx1].map(l => [m.l + (l - lx0) / (lx1 - lx0) * (W - m.l - m.r), Y(Math.pow(10, R.fit_a + R.pop_elasticity * l))]);
+    el("line", { x1: fx[0][0], y1: fx[0][1], x2: fx[1][0], y2: fx[1][1], stroke: "var(--muted)", "stroke-dasharray": "5 4", "stroke-width": 1.4 }, svg);
+    const lab = new Set([...R.over_expected.slice(0, nar ? 5 : 9), ...R.under_expected.slice(-4), ...R.top_in_2005_2025.slice(0, 5)].map(r => r[0]));
+    pts.forEach(p => { const c = el("circle", { cx: X(p.pop), cy: Y(p.m), r: nar ? 3 : 3.6, fill: resCol(p.res), stroke: "var(--bg)", "stroke-width": .6 }, svg);
+      hover(c, `<b>${esc(p.t)}</b><br>${fmt(p.pop)} people<br>${fmt(p.m)} mentions, 2005 to 2025<br>${(Math.pow(10, p.res)).toFixed(2)} times the trend`); c.onclick = () => { setMode("size"); pickPlace(p, true); }; });
+    const bx = []; pts.filter(p => lab.has(p.t)).sort((a, b) => b.m - a.m).forEach(p => { const x = X(p.pop) + 6, y = Y(p.m) + 4, b = [x, y - 10, x + p.t.length * 6.6, y + 2]; if (bx.some(o => b[0] < o[2] && b[2] > o[0] && b[1] < o[3] && b[3] > o[1])) return; bx.push(b); lbl(svg, x, y, p.t, "lab s b"); });
+  });
+}
+function londonChart() {
+  resp(document.getElementById("c_london"), (W, nar) => {
+    const d = Object.entries(R.london_share_by_decade), H = 220, m = { l: 34, r: 8, t: 14, b: 26 };
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "London's share of town and city mentions by decade" }, document.getElementById("c_london"));
+    const max = Math.ceil(Math.max(...d.map(x => x[1])) / 10) * 10, bw = (W - m.l - m.r) / d.length;
+    const Y = v => H - m.b - v / max * (H - m.t - m.b);
+    for (let t = 0; t <= max; t += 10) { el("line", { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t), stroke: "var(--rule)" }, svg); lbl(svg, m.l - 5, Y(t) + 4, t + "%", "lab m s", "end"); }
+    d.forEach(([k, v], i) => { const x = m.l + i * bw; const r = el("rect", { x: x + 3, y: Y(v), width: bw - 6, height: Y(0) - Y(v), fill: "var(--hot)" }, svg); hover(r, `<b>${k}s</b><br>${v}% of mentions`); lbl(svg, x + bw / 2, H - m.b + 16, nar ? "'" + k.slice(2) : k + "s", "lab m s", "middle"); if (!nar || i % 2 === 0) lbl(svg, x + bw / 2, Y(v) - 4, v, "lab s b", "middle"); });
+  });
+}
+const NATC = { England: "#8A5A2B", Scotland: "#1F4F8B", Wales: "#2E6B4E", "Northern Ireland": "#B23A48" };
+function natChart() {
+  resp(document.getElementById("c_nat"), (W, nar) => {
+    const H = 260, m = { l: 34, r: nar ? 8 : 120, t: 12, b: 26 }, decs = Object.keys(R.london_share_by_decade);
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Mentions of the four nations for every 100 town mentions, by decade" }, document.getElementById("c_nat"));
+    const val = (n, k) => R.nat_per100[n][k];
+    const max = Math.ceil(Math.max(...Object.keys(NATC).flatMap(n => decs.map(k => val(n, k)))) / 10) * 10;
+    const X = i => m.l + (i + .5) / decs.length * (W - m.l - m.r), Y = v => H - m.b - v / max * (H - m.t - m.b);
+    for (let t = 0; t <= max; t += max > 60 ? 20 : 10) { el("line", { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t), stroke: "var(--rule)" }, svg); lbl(svg, m.l - 5, Y(t) + 4, t, "lab m s", "end"); }
+    decs.forEach((k, i) => lbl(svg, X(i), H - m.b + 16, nar ? "'" + k.slice(2) : k + "s", "lab m s", "middle"));
+    Object.keys(NATC).forEach(n => { let d = ""; decs.forEach((k, i) => d += (i ? "L" : "M") + X(i).toFixed(1) + "," + Y(val(n, k)).toFixed(1)); el("path", { d, fill: "none", stroke: NATC[n], "stroke-width": 2.4 }, svg);
+      decs.forEach((k, i) => { const c = el("circle", { cx: X(i), cy: Y(val(n, k)), r: 3, fill: NATC[n] }, svg); hover(c, `<b>${n}, ${k}s</b><br>${val(n, k)} per 100 town mentions`); });
+      if (!nar) lbl(svg, X(decs.length - 1) + 8, Y(val(n, decs[decs.length - 1])) + 4, n, "lab s b"); });
+  });
+  document.getElementById("c_nat_leg").innerHTML = Object.entries(NATC).map(([n, c]) => `<span><i style="background:${c}"></i>${n}</span>`).join("");
+}
+function ownChart() {
+  resp(document.getElementById("c_own"), (W, nar) => {
+    const b = R.own_hist, H = 210, m = { l: 34, r: 8, t: 12, b: 30 }, max = Math.max(...b.counts);
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Histogram of the share of each seat's mentions that come from its own member" }, document.getElementById("c_own"));
+    const bw = (W - m.l - m.r) / b.counts.length, Y = v => H - m.b - v / max * (H - m.t - m.b);
+    b.counts.forEach((v, i) => { const r = el("rect", { x: m.l + i * bw + 1, y: Y(v), width: bw - 2, height: Y(0) - Y(v), fill: "var(--green)" }, svg); hover(r, `<b>${b.edges[i]}% to ${b.edges[i + 1]}%</b><br>${v} seats`); });
+    [0, 20, 40, 60, 80, 100].forEach(t => lbl(svg, m.l + t / 100 * (W - m.l - m.r), H - m.b + 16, t + "%", "lab m s", "middle"));
+    const med = R.seat_own_share_median, xm = m.l + med / 100 * (W - m.l - m.r);
+    el("line", { x1: xm, x2: xm, y1: m.t, y2: H - m.b, stroke: "var(--fg)", "stroke-dasharray": "4 3" }, svg); lbl(svg, xm + 5, m.t + 10, "median " + med + "%", "lab s b");
+    lbl(svg, m.l - 5, Y(max) + 4, max, "lab m s", "end"); lbl(svg, m.l - 5, Y(0) + 4, 0, "lab m s", "end");
+  });
+}
+function spikes() {
+  const box = document.getElementById("spikes");
+  box.innerHTML = R.spike_cards.map((s, i) => `<button class="spike" data-sp="${i}"><span class="y">${s.year}</span><b>${esc(s.term)}</b>${s.ratio} times its usual share<svg viewBox="0 0 200 34" preserveAspectRatio="none" aria-hidden="true">${sparkPath(s.series, 200, 34, s.year)}</svg>${s.titles && s.titles.length ? `<span class="tt">${s.titles.map(esc).join("; ")}</span>` : ""}</button>`).join("");
+  box.querySelectorAll("[data-sp]").forEach(b => b.onclick = () => { const s = R.spike_cards[+b.dataset.sp], p = PL && PL.find(x => x.t === s.term); setMode("time"); setYear(s.year); if (p) { lmap.setView([p.la, p.lo], 8, { animate: false }); pickPlace(p, false); } showMap(); });
+}
+function sparkPath(series, w, h, hy) {
+  const max = Math.max(...series, 1), n = series.length; let d = "";
+  series.forEach((v, i) => { d += (i ? "L" : "M") + (i / (n - 1) * w).toFixed(1) + "," + (h - 2 - v / max * (h - 4)).toFixed(1); });
+  const hx = (hy - Y0) / (n - 1) * w;
+  return `<path d="${d}" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".75"/><line x1="${hx}" x2="${hx}" y1="0" y2="${h}" stroke="var(--hot)" stroke-width="2" opacity=".5"/>`;
+}
+function ambigTable() {
+  document.getElementById("ambig").innerHTML = `<table class="t"><thead><tr><th>Name</th><th>Treatment</th><th>Why</th></tr></thead><tbody>${R.ambig.map(a => `<tr><td>${esc(a[0])}</td><td>${esc(a[1])}</td><td>${esc(a[2])}</td></tr>`).join("")}</tbody></table>`;
+}
+
+/* ===== map ===== */
+let lmap = null, tiles = null, hills = null, rend = null, dotL = null, nameL = null, natL = null, bigL = null;
+let mode = "count", year = 1940, sel = null, playing = null;
+const LY = { base: "light", colour: 100, hills: false, hillK: 45, names: true, nameLvl: 1, lines: true, lineK: 55, size: 100 };
+const LYDEF = { ...LY };
+try { Object.assign(LY, JSON.parse(localStorage.getItem("hansard_layers") || "{}")); } catch (e) {}
+const saveLY = () => { try { localStorage.setItem("hansard_layers", JSON.stringify(LY)); } catch (e) {} };
+const RES = ["#3E5F8F", "#7F98BE", "#C9C6BC", "#E3A06E", "#C0561B"], RESD = ["#7F9ED0", "#5D7091", "#5E6066", "#B9774A", "#F08A4B"];
+function resCol(r) { const P = isDark() ? RESD : RES; if (r == null) return css("--none"); const b = [-.3, -.1, .1, .3]; let k = 0; while (k < 4 && r >= b[k]) k++; return P[k]; }
+const OWN = ["#E7EFE9", "#B6D3C1", "#7FB194", "#478B67", "#205C40"], OWND = ["#26302A", "#2F5640", "#3E7A58", "#58A27A", "#8FD3AE"];
+function ownCol(s) { const P = isDark() ? OWND : OWN; if (s == null) return css("--none"); const b = [.05, .1, .2, .3]; let k = 0; while (k < 4 && s >= b[k]) k++; return P[k]; }
+function zf() { const z = lmap.getZoom(); return Math.pow(1.22, z - 6); }
+function rad(v, ref) { return Math.min(64 * zf(), Math.max(1.6, Math.sqrt(v / ref) * 26 * zf() * LY.size / 100)); }
+function vis(p) { if (mode === "size") return p.per100k != null; if (mode === "time") return !p.f && YRS && (YRS[p.t] || [])[year - Y0] > 0; return true; }
+function draw() {
+  if (!PL || !lmap) return;
+  dotL.clearLayers(); bigL.clearLayers();
+  const op = LY.colour / 100, fg = css("--fg"), bg = css("--bg"), none = css("--none"), hot = css("--hot");
+  const shown = [];
+  if (mode === "seats") {
+    if (!SE) return;
+    const ref = R.seat_ref;
+    SE.filter(s => s.la != null).sort((a, b) => b.py - a.py).forEach(s => { const r = Math.max(2.2, Math.sqrt((s.py || 0) / ref) * 14 * zf() * LY.size / 100), isS = sel === s;
+      const mk = L.circleMarker([s.la, s.lo], { renderer: rend, radius: isS ? r + 2 : r, fillColor: s.pf ? none : ownCol(s.os), fillOpacity: s.pf ? .35 : op, color: isS ? fg : bg, weight: isS ? 2.4 : .6 });
+      mk.on("click", () => pickSeat(s, true)); mk.on("mouseover", ev => { const p = ev.containerPoint, b = lmap.getContainer().getBoundingClientRect(); showTip(`<b>${esc(s.n)}</b><br>${s.py == null ? "" : s.py + " mentions a year"}${s.os == null ? "" : ", " + Math.round(100 * s.os) + "% by its own MP"}`, b.left + p.x, b.top + p.y - 6); }); mk.on("mouseout", hideTip); mk.addTo(dotL); });
+    legend(); return;
+  }
+  let ref = 400, val = p => p.m;
+  if (mode === "count" || mode === "size") { ref = 3400; val = p => p.m; }
+  if (mode === "time") { ref = R.time_ref; val = p => { const c = (YRS[p.t] || [])[year - Y0] || 0, d = R.den[year - Y0] || 1; return c / d * 10000; }; }
+  const list = PL.filter(vis).map(p => [p, val(p)]).sort((a, b) => b[1] - a[1]);
+  for (const [p, v] of list) {
+    const r = rad(v, ref), isS = sel === p, hol = !!p.f;
+    let fill = hot;
+    if (mode === "size") fill = resCol(p.res);
+    const mk = L.circleMarker([p.la, p.lo], { renderer: rend, radius: isS ? r + 2 : r, fillColor: hol ? none : fill, fillOpacity: hol ? .12 : (mode === "count" ? .55 * op + .1 : op * .9), color: isS ? fg : (hol ? none : bg), weight: isS ? 2.4 : (hol ? 1.2 : .7) });
+    mk.on("click", () => pickPlace(p, true));
+    mk.on("mouseover", ev => { const q = ev.containerPoint, b = lmap.getContainer().getBoundingClientRect(); showTip(`<b>${esc(p.t)}</b><br>${mode === "time" ? fmt((YRS[p.t] || [])[year - Y0]) + " mentions in " + year : fmt(p.m) + " mentions, 2005 to 2025"}${p.f ? "<br>ambiguous name" : ""}`, b.left + q.x, b.top + q.y - 6); });
+    mk.on("mouseout", hideTip); mk.addTo(dotL);
+    if (!hol && r > 9) shown.push([p, r]);
+  }
+  // name the biggest circles so it is easy to see where you are
+  const boxes = [];
+  if (!(LY.names && lmap.getZoom() >= 7)) for (const [p, r] of shown.slice(0, 40)) { const pt = lmap.latLngToContainerPoint([p.la, p.lo]), w = p.t.length * 7 + 6, bx = [pt.x - w / 2, pt.y - 7, pt.x + w / 2, pt.y + 7];
+    if (boxes.some(o => bx[0] < o[2] && bx[2] > o[0] && bx[1] < o[3] && bx[3] > o[1])) continue; boxes.push(bx);
+    L.marker([p.la, p.lo], { interactive: false, keyboard: false, pane: "bigp", icon: L.divIcon({ className: "city big", html: esc(p.t), iconSize: null, iconAnchor: [w / 2, 6] }) }).addTo(bigL); }
+  legend();
+}
+function legend() {
+  const box = document.getElementById("legend");
+  if (mode === "count") box.innerHTML = `<div class="legend"><span><i style="background:var(--hot)"></i>circle area: Commons contributions with "in" plus the name, 2005 to 2025</span><span><i style="background:transparent;border:1.5px solid var(--none)"></i>ambiguous name, not ranked</span></div>`;
+  else if (mode === "size") box.innerHTML = `<div class="ramp">Mentions compared with what population predicts <span class="bar">${[-.4, -.2, 0, .2, .4].map(r => `<span style="background:${resCol(r)}"></span>`).join("")}</span> under half · about as expected · over twice · places of 50,000+</div>`;
+  else if (mode === "time") box.innerHTML = `<div class="legend"><span><i style="background:var(--hot)"></i>circle area: share of all town mentions in ${year}</span><span><b>${fmt(R.den[year - Y0])}</b> counted mentions that year${year === 2026 ? " (to 28 October)" : ""}</span></div>`;
+  else box.innerHTML = `<div class="ramp">Share of mentions by the seat's own MP <span class="bar">${[.02, .07, .15, .25, .4].map(s => `<span style="background:${ownCol(s)}"></span>`).join("")}</span> under 5% · 10 · 20 · 30% and over · circle area: mentions a year · grey: name also an ambiguous place</div>`;
+}
+function spark(series, hy, w, h) {
+  const max = Math.max(...series, 1), n = series.length, X = i => 28 + i / (n - 1) * (w - 34), Y = v => h - 16 - v / max * (h - 26);
+  let d = ""; series.forEach((v, i) => d += (i ? "L" : "M") + X(i).toFixed(1) + "," + Y(v).toFixed(1));
+  const ticks = [1910, 1950, 1990, 2026].map(y => `<text x="${X(y - Y0)}" y="${h - 3}" class="lab m s" text-anchor="middle">${y === 2026 ? "2026" : y}</text>`).join("");
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block" role="img" aria-label="Mentions each year, 1909 to 2026"><line x1="28" x2="${w - 6}" y1="${h - 16}" y2="${h - 16}" stroke="var(--rule)"/><text x="24" y="${Y(max) + 4}" class="lab m s" text-anchor="end">${fmt(max)}</text><path d="${d}" fill="none" stroke="var(--hot)" stroke-width="1.6"/>${hy ? `<line x1="${X(hy - Y0)}" x2="${X(hy - Y0)}" y1="6" y2="${h - 16}" stroke="var(--over)" stroke-dasharray="3 2"/>` : ""}${ticks}</svg>`;
+}
+function pickPlace(p, fromMap) {
+  sel = p; draw();
+  const s = YRS ? YRS[p.t] || [] : [];
+  const series = Array.from({ length: YN - Y0 + 1 }, (_, i) => s[i] || 0);
+  const pk = p.py ? `<p style="margin:6px 0 0">Its biggest year, for its share of all town mentions, was <b>${p.py}</b>, with ${fmt(p.pc)} mentions, ${p.pr} times its usual share.</p>` : "";
+  const res = p.res != null ? `<tr><td>Compared with places its size</td><td class="num">${(Math.pow(10, p.res)).toFixed(2)} times the trend</td></tr><tr><td>Per 100,000 people (2005 to 2025)</td><td class="num">${p.per100k}</td></tr>` : "";
+  document.getElementById("info").innerHTML = `<p class="t">${esc(p.t)}</p><p class="c">${esc(p.n || "")}${p.pop ? " · " + fmt(p.pop) + " people (" + p.ps + ")" : ""}</p>` +
+    (p.f ? `<div class="flag">${esc(p.w)}. Shown for reference; not in the rankings.</div>` : (p.w ? `<div class="flag">${esc(p.w)}.</div>` : "")) +
+    `<table><tr><td>"In ${esc(p.t)}", 1909 to 2025</td><td class="num">${fmt(p.ml)}</td></tr><tr><td>"In ${esc(p.t)}", 2005 to 2025</td><td class="num">${fmt(p.m)}</td></tr><tr><td>Any mention, 2005 to 2025</td><td class="num">${fmt(p.a)}${p.af ? " *" : ""}</td></tr>${res}</table>` +
+    `<p style="margin:10px 0 2px"><b>"In ${esc(p.t)}" in the Commons, every year since 1909</b></p>${spark(series, p.py, 560, 120)}${pk}` +
+    (p.af ? `<p class="src">* The any-mention count includes other uses of the name (${p.af === "surname" ? "it is also a member's surname" : p.af === "other" ? "far fewer of its mentions are “in” phrases than usual, a sign of other meanings" : "see note"}).</p>` : "") +
+    (mode === "time" ? `<p class="src">In ${year}: ${fmt(series[year - Y0])} mentions.</p>` : "");
+  if (!fromMap) showMap();
+}
+function pickSeat(s, fromMap) {
+  sel = s; draw();
+  const os = s.os == null ? null : Math.round(100 * s.os);
+  document.getElementById("info").innerHTML = `<p class="t">${esc(s.n)}</p><p class="c">${esc(s.na || "")} · seat in use ${s.s.slice(0, 4)} to ${s.e >= "2026" ? "now" : s.e.slice(0, 4)} (counted from 2005) · ${s.k} member${s.k > 1 ? "s" : ""}</p>` +
+    (s.pf ? `<div class="flag">The seat's name is also an ambiguous place name, so these counts include other meanings.</div>` : (s.ap ? `<div class="flag">The seat's name is also a town's name, so mentions of the town are included.</div>` : "")) +
+    `<table><tr><td>Contributions naming the seat</td><td class="num">${fmt(s.a)}</td></tr><tr><td>by its own MP</td><td class="num">${fmt(s.o)}</td></tr><tr><td>by other members</td><td class="num">${fmt(s.a - s.o)}</td></tr><tr><td>containing "Member for ${esc(s.n)}"</td><td class="num">${fmt(s.mf)}</td></tr><tr><td>Mentions a year</td><td class="num">${s.py == null ? "" : s.py}</td></tr></table>` +
+    (os == null ? "" : `<div class="ownbar"><span style="width:${os}%;background:var(--green)"></span><span style="width:${100 - os}%;background:var(--none)"></span></div><p class="src" style="margin-top:2px">${os}% own MP, ${100 - os}% others. Median seat: ${R.seat_own_share_median}%.</p>`);
+  if (!fromMap) showMap();
+}
+function setYear(y) { year = Math.max(Y0, Math.min(YN, y)); document.getElementById("yr").value = year; document.getElementById("when").textContent = year; draw(); if (sel && sel.t) pickPlace(sel, true); }
+function setMode(m) { mode = m; sel = null; document.querySelectorAll("[data-mode]").forEach(x => x.setAttribute("aria-pressed", x.dataset.mode === m)); document.getElementById("timebar").hidden = m !== "time"; if (m !== "time") stop(); if (m === "seats" && !SE) loadSeats(); draw(); }
+let seatP = null;
+function loadSeats() { if (!seatP) seatP = fetch("data/page/seats.json").then(r => r.json()).then(d => { SE = d; draw(); return d; }); return seatP; }
+function stop() { if (playing) { clearInterval(playing); playing = null; document.getElementById("play").textContent = "▶ Play"; } }
+function showMap() { const m = document.getElementById("lmap"), r = m.getBoundingClientRect(); if (r.top < 0 || r.bottom > innerHeight) document.querySelector(".mapbox .ctl").scrollIntoView({ behavior: "smooth", block: "start" }); }
+function initMap() {
+  if (!window.L) { document.getElementById("lmap").innerHTML = '<p style="padding:16px">The map library did not load.</p>'; return; }
+  lmap = L.map("lmap", { preferCanvas: true, zoomSnap: .5, minZoom: 4.5, maxZoom: 12, scrollWheelZoom: false });
+  lmap.fitBounds([[49.9, -8.4], [58.8, 1.8]], { padding: innerWidth < 600 ? [0, 0] : [6, 6] });
+  lmap.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+  lmap.createPane("land").style.zIndex = 250; lmap.createPane("hill").style.zIndex = 260; lmap.createPane("lines").style.zIndex = 380; lmap.createPane("bigp").style.zIndex = 640;
+  lmap.getPane("bigp").style.pointerEvents = "none";
+  rend = L.canvas({ padding: .5, tolerance: 4 });
+  dotL = L.layerGroup().addTo(lmap); nameL = L.layerGroup(); bigL = L.layerGroup().addTo(lmap);
+  initLayers();
+  lmap.on("zoomend", () => { draw(); placeNames(); });
+  lmap.on("moveend", () => { placeNames(); draw(); });
+  lmap.on("click focus", () => lmap.scrollWheelZoom.enable());
+  lmap.getContainer().addEventListener("mouseleave", () => lmap.scrollWheelZoom.disable());
+  fetch("data/nations.geojson").then(r => r.json()).then(gj => { natL = gj; applyLayers(); });
+  fetch("data/page/labels.json").then(r => r.json()).then(p => { LAB = p; placeNames(); });
+  redraws.push(() => { applyLayers(); draw(); });
+}
+let landL = null, lineL = null;
+function tileUrl() { return `https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${LY.base === "dark" || (LY.base === "auto" && isDark()) ? "Dark" : "Light"}_Gray_Base/MapServer/tile/{z}/{y}/{x}`; }
+function initLayers() {
+  const Ctl = L.Control.extend({ options: { position: "topright" }, onAdd() {
+    const d = L.DomUtil.create("div"); L.DomEvent.disableClickPropagation(d); L.DomEvent.disableScrollPropagation(d);
+    d.innerHTML = `<button class="lyrBtn" aria-expanded="false" aria-controls="lyrPanel">Map layers</button>
+<div class="lyrPanel" id="lyrPanel" hidden>
+ <div class="row"><label>Base map</label><div class="sub"><select id="lyBase" aria-label="Base map"><option value="light">Light grey</option><option value="dark">Dark grey</option><option value="none">Plain land</option></select></div></div>
+ <div class="row"><label><input type="checkbox" id="lyHills"> Hills</label><div class="sub"><span>strength</span><input type="range" id="lyHillK" min="10" max="100" step="5" aria-label="Hill shading strength"></div></div>
+ <div class="row"><label><input type="checkbox" id="lyNames"> Place names</label><div class="sub"><span>how many</span><select id="lyNameLvl" aria-label="How many place names"><option value="0">Cities only</option><option value="1">Cities and towns</option><option value="2">Down to villages</option></select></div></div>
+ <div class="row"><label><input type="checkbox" id="lyLines"> Coast and borders</label><div class="sub"><span>strength</span><input type="range" id="lyLineK" min="10" max="100" step="5" aria-label="Coast and border strength"></div></div>
+ <div class="row"><label style="font-weight:600">Circles</label><div class="sub"><span>colour</span><input type="range" id="lyColour" min="25" max="100" step="5" aria-label="Circle colour strength"></div><div class="sub"><span>size</span><input type="range" id="lySize" min="40" max="200" step="10" aria-label="Circle size"></div></div>
+ <button class="reset" id="lyReset">Reset layers</button>
+</div>`;
+    return d; } });
+  lmap.addControl(new Ctl());
+  const q = id => document.getElementById(id), btn = lmap.getContainer().querySelector(".lyrBtn"), pan = q("lyrPanel");
+  btn.onclick = () => { const o = pan.hidden; pan.hidden = !o; btn.setAttribute("aria-expanded", o); };
+  const sync = () => { q("lyBase").value = LY.base; q("lyHills").checked = LY.hills; q("lyHillK").value = LY.hillK; q("lyNames").checked = LY.names; q("lyNameLvl").value = LY.nameLvl; q("lyLines").checked = LY.lines; q("lyLineK").value = LY.lineK; q("lyColour").value = LY.colour; q("lySize").value = LY.size; };
+  const on = (id, ev, f) => q(id).addEventListener(ev, e => { f(e.target); saveLY(); applyLayers(); });
+  on("lyBase", "change", t => LY.base = t.value);
+  on("lyHills", "change", t => LY.hills = t.checked); on("lyHillK", "input", t => { LY.hillK = +t.value; LY.hills = true; q("lyHills").checked = true; });
+  on("lyNames", "change", t => LY.names = t.checked); on("lyNameLvl", "change", t => { LY.nameLvl = +t.value; LY.names = true; q("lyNames").checked = true; });
+  on("lyLines", "change", t => LY.lines = t.checked); on("lyLineK", "input", t => { LY.lineK = +t.value; LY.lines = true; q("lyLines").checked = true; });
+  on("lyColour", "input", t => { LY.colour = +t.value; draw(); }); on("lySize", "input", t => { LY.size = +t.value; draw(); });
+  q("lyReset").onclick = () => { Object.assign(LY, LYDEF); saveLY(); sync(); applyLayers(); draw(); };
+  sync(); applyLayers();
+}
+function applyLayers() {
+  if (!lmap) return;
+  if (LY.base !== "none") { if (!tiles) tiles = L.tileLayer(tileUrl(), { attribution: "Tiles &copy; Esri", maxZoom: 16 }); tiles.setUrl(tileUrl()); tiles.addTo(lmap); } else if (tiles) tiles.remove();
+  if (natL) {
+    if (landL) landL.remove(); if (lineL) lineL.remove();
+    if (LY.base === "none") landL = L.geoJSON(natL, { pane: "land", interactive: false, style: () => ({ stroke: false, fillColor: css("--land"), fillOpacity: 1 }) }).addTo(lmap);
+    if (LY.lines) lineL = L.geoJSON(natL, { pane: "lines", interactive: false, style: () => ({ color: css("--fg"), weight: .9, opacity: .12 + LY.lineK / 100 * .6, fill: false }) }).addTo(lmap);
+  }
+  if (LY.hills) { if (!hills) hills = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}", { pane: "hill", attribution: "Hill shading &copy; Esri", maxZoom: 13 }); hills.setOpacity(LY.hillK / 100 * .6); hills.addTo(lmap); } else if (hills) hills.remove();
+  if (LY.names) nameL.addTo(lmap); else nameL.remove();
+  placeNames(); draw();
+}
+const MAJOR = new Set(["London", "Birmingham", "Manchester", "Glasgow", "Edinburgh", "Cardiff", "Belfast", "Dublin", "Liverpool", "Leeds"]);
+function placeNames() {
+  if (!lmap || !nameL || !LAB) return;
+  nameL.clearLayers(); if (!LY.names) return;
+  const z = lmap.getZoom(), bb = lmap.getBounds().pad(.05), lvl = LY.nameLvl;
+  if (z < 7 && lvl < 2) return;  // at country scale the biggest circles carry their own names
+  const minR = lvl === 0 ? 3 : lvl === 1 ? (z >= 7.5 ? 2 : 3) : (z >= 9.5 ? 0 : z >= 7.5 ? 2 : 3);
+  const cand = LAB.filter(p => p[3] >= minR && bb.contains([p[2], p[1]])).sort((a, b) => (MAJOR.has(b[0]) - MAJOR.has(a[0])) || b[3] - a[3]);
+  const boxes = [], out = [];
+  for (const c of cand) { const pt = lmap.latLngToContainerPoint([c[2], c[1]]), bx = [pt.x - 4, pt.y - 8, pt.x + 10 + c[0].length * 6.8, pt.y + 7];
+    if (boxes.some(o => bx[0] < o[2] && bx[2] > o[0] && bx[1] < o[3] && bx[3] > o[1])) continue;
+    boxes.push(bx); out.push(c); if (out.length >= 140) break; }
+  for (const c of out) L.marker([c[2], c[1]], { interactive: false, keyboard: false, icon: L.divIcon({ className: "city" + (c[3] === 0 ? " r0" : ""), html: `<i></i>${esc(c[0])}`, iconSize: null, iconAnchor: [3, 6] }) }).addTo(nameL);
+}
+/* controls */
+document.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => setMode(b.dataset.mode));
+const yr = document.getElementById("yr");
+yr.oninput = () => { stop(); setYear(+yr.value); };
+document.getElementById("play").onclick = () => { if (playing) return stop(); if (year >= YN) setYear(Y0); document.getElementById("play").textContent = "❚❚ Pause";
+  playing = setInterval(() => { if (year >= YN) { stop(); return; } setYear(year + 1); }, 450); };
+/* stories */
+document.getElementById("stories").innerHTML = R.stories.map((s, i) => `<button data-s="${i}"><b>${esc(s.t)}</b>${esc(s.d)}</button>`).join("");
+document.querySelectorAll("[data-s]").forEach(b => b.onclick = () => { const s = R.stories[+b.dataset.s]; setMode(s.mode); if (s.year) setYear(s.year); if (lmap) lmap.fitBounds(s.b, { animate: false });
+  const p = s.place && PL ? PL.find(x => x.t === s.place) : null, lead = `<p style="margin:0 0 8px">${esc(s.long)}</p>`;
+  if (p) { pickPlace(p, true); document.getElementById("info").insertAdjacentHTML("afterbegin", lead); }
+  else if (s.seat) { loadSeats().then(d => { const q = d.find(x => x.n === s.seat); if (q) { pickSeat(q, true); document.getElementById("info").insertAdjacentHTML("afterbegin", lead); } }); }
+  else document.getElementById("info").innerHTML = `<p class="t">${esc(s.t)}</p>` + lead;
+  showMap(); });
+/* search: counted places first, then any village (jumps to the nearest counted place) */
+(() => {
+  const q = document.getElementById("q"), sug = document.getElementById("sug");
+  const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  let list = [], s = -1;
+  function go(it) { sug.style.display = "none"; q.setAttribute("aria-expanded", "false"); q.value = it.label; q.blur();
+    if (mode === "seats") setMode("count");
+    let p = it.p; if (!p) { const kx = Math.cos(it.la * Math.PI / 180); let bd = 1e9; PL.filter(x => !x.f).forEach(x => { const d = ((x.lo - it.lo) * kx) ** 2 + (x.la - it.la) ** 2; if (d < bd) { bd = d; p = x; } }); }
+    lmap.setView([it.la, it.lo], 9, { animate: false }); pickPlace(p, true);
+    if (!it.p) document.getElementById("info").insertAdjacentHTML("afterbegin", `<p class="src" style="margin:0 0 6px">${esc(it.label)} is not in the list of counted places; this is the nearest counted place.</p>`);
+    showMap(); }
+  function render() { sug.innerHTML = list.map((p, i) => `<li role="option" aria-selected="${i === s}" data-i="${i}">${esc(p.label)} <span>${esc(p.sub)}</span></li>`).join(""); sug.style.display = list.length ? "block" : "none"; q.setAttribute("aria-expanded", list.length > 0); }
+  q.addEventListener("input", () => { if (!PL) return; const t = norm(q.value); s = -1; if (t.length < 2) { list = []; render(); return; }
+    const a = PL.filter(p => norm(p.t).startsWith(t)).sort((x, y) => y.m - x.m).slice(0, 6).map(p => ({ label: p.t, sub: "counted · " + fmt(p.m), p, la: p.la, lo: p.lo }));
+    const seen = new Set(a.map(x => x.label));
+    const b = (LAB || []).filter(p => norm(p[0]).startsWith(t) && !seen.has(p[0])).sort((x, y) => y[3] - x[3]).slice(0, 8 - a.length).map(p => ({ label: p[0], sub: p[4] || "", la: p[2], lo: p[1] }));
+    list = a.concat(b); render(); });
+  q.addEventListener("keydown", e => { if (!list.length) return; if (e.key === "ArrowDown") { s = Math.min(list.length - 1, s + 1); render(); e.preventDefault(); } else if (e.key === "ArrowUp") { s = Math.max(0, s - 1); render(); e.preventDefault(); } else if (e.key === "Enter") { go(list[Math.max(0, s)]); e.preventDefault(); } else if (e.key === "Escape") { list = []; render(); } });
+  sug.addEventListener("click", e => { const li = e.target.closest("li[data-i]"); if (li) go(list[+li.dataset.i]); e.stopPropagation(); });
+  document.addEventListener("click", e => { if (e.target !== q) { sug.style.display = "none"; q.setAttribute("aria-expanded", "false"); } });
+})();
+topChart(); londonChart(); natChart(); ownChart(); spikes(); ambigTable();
+initMap();
+Promise.all([fetch("data/page/places.json").then(r => r.json()), fetch("data/page/years.json").then(r => r.json())]).then(([p, y]) => { PL = p; YRS = y; draw(); scatter(); });
+</script>
+</body>
+</html>
